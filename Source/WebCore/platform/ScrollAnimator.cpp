@@ -425,7 +425,7 @@ void ScrollAnimator::removeWheelEventTestCompletionDeferralForReason(ScrollingNo
         monitor->removeDeferralForReason(identifier, reason);
 }
 
-#if USE(COORDINATED_GRAPHICS)
+#if USE(COORDINATED_GRAPHICS) || PLATFORM(WIN)
 bool ScrollAnimator::scrollAnimationEnabled() const
 {
     return protect(scrollableArea())->scrollAnimatorEnabled();
