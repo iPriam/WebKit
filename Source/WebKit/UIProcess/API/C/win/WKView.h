@@ -44,6 +44,11 @@ WK_EXPORT void WKViewSetIsInWindow(WKViewRef view, bool isInWindow);
 WK_EXPORT void WKViewSetUsesOffscreenRendering(WKViewRef view, bool enabled);
 WK_EXPORT void WKViewSetScrollOffsetOnNextResize(WKViewRef view, WKSize scrollOffset);
 
+// Advance the WebKit UI-process run loop once. Embedders with their own native
+// loop must call this after pumping Win32 messages so WebKit timers and queued
+// work can make progress without taking ownership of the host thread.
+WK_EXPORT void WKRunLoopCycle();
+
 #ifdef __cplusplus
 }
 #endif

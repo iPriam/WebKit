@@ -1057,6 +1057,13 @@ macro(GENERATE_MESSAGE_SOURCES _output_source _inputs)
         ${WebKit_DERIVED_SOURCES_DIR}/MessageNames.cpp
     )
 
+    # The receiver list alone runs past the 8191 characters cmd.exe accepts for
+    # the batch file CMake writes for a multi-command rule. argparse reads @file
+    # as one argument per line.
+    set(_messages_input_list ${WebKit_DERIVED_SOURCES_DIR}/MessageReceivers.input-list)
+    string(REPLACE ";" "\n" _messages_input_list_contents "${_inputs}")
+    file(WRITE ${_messages_input_list} "${_messages_input_list_contents}\n")
+
     set(_messages_stage_dir ${WebKit_DERIVED_SOURCES_DIR}/.messages-stage)
     # copy_if_different (rather than copy_directory_if_different, which is unavailable on
     # older CMake versions) copies only changed files back, leaving the timestamps of
@@ -1076,9 +1083,10 @@ macro(GENERATE_MESSAGE_SOURCES _output_source _inputs)
             ${WEBKIT_DIR}/Scripts/webkit/messages.py
             ${WEBKIT_DIR}/Scripts/webkit/model.py
             ${WEBKIT_DIR}/Scripts/webkit/parser.py
+            ${_messages_input_list}
             ${_input_files}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${_messages_stage_dir}
-        COMMAND ${PYTHON_EXECUTABLE} ${WEBKIT_DIR}/Scripts/generate-message-receiver.py --preserve-subdirs ${WEBKIT_DIR} ${_inputs} --output-dir ${_messages_stage_dir}
+        COMMAND ${PYTHON_EXECUTABLE} ${WEBKIT_DIR}/Scripts/generate-message-receiver.py --preserve-subdirs ${WEBKIT_DIR} @${_messages_input_list} --output-dir ${_messages_stage_dir}
         ${_messages_copy_commands}
         WORKING_DIRECTORY ${WebKit_DERIVED_SOURCES_DIR}
         VERBATIM
@@ -1219,15 +1227,24 @@ foreach (_rel IN LISTS _serializers_outputs)
     list(APPEND _serializers_absolute_outputs ${WebKit_DERIVED_SOURCES_DIR}/${_rel})
     list(APPEND _serializers_copy_commands COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_serializers_stage_dir}/${_rel} ${WebKit_DERIVED_SOURCES_DIR}/${_rel})
 endforeach ()
+# Listing every serialization description on the command line produces a 43000
+# character invocation, well past the 8191 characters cmd.exe accepts for the
+# batch file CMake writes for a multi-command rule. argparse reads @file as one
+# argument per line.
+set(_serializers_input_list ${WebKit_DERIVED_SOURCES_DIR}/GeneratedSerializers.input-list)
+string(REPLACE ";" "\n" _serializers_input_list_contents "${WebKit_SERIALIZATION_DEPENDENCIES}")
+file(WRITE ${_serializers_input_list} "${_serializers_input_list_contents}\n")
+
 add_custom_command(
     OUTPUT
         ${_serializers_absolute_outputs}
     MAIN_DEPENDENCY ${WEBKIT_DIR}/Scripts/generate-serializers.py
     DEPENDS
         ${WEBKIT_DIR}/Scripts/webkit/opaque_ipc_types.py
+        ${_serializers_input_list}
         ${WebKit_SERIALIZATION_DEPENDENCIES}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${_serializers_stage_dir}
-    COMMAND ${PYTHON_EXECUTABLE} ${WEBKIT_DIR}/Scripts/generate-serializers.py ${WebKit_GENERATED_SERIALIZERS_SUFFIX} --split-by-directory ${WebKit_SERIALIZATION_DEPENDENCIES} --output-dir ${_serializers_stage_dir}
+    COMMAND ${PYTHON_EXECUTABLE} ${WEBKIT_DIR}/Scripts/generate-serializers.py ${WebKit_GENERATED_SERIALIZERS_SUFFIX} --split-by-directory @${_serializers_input_list} --output-dir ${_serializers_stage_dir}
     ${_serializers_copy_commands}
     WORKING_DIRECTORY ${WebKit_DERIVED_SOURCES_DIR}
     VERBATIM

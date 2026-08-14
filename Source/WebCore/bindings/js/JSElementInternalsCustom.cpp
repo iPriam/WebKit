@@ -36,6 +36,7 @@
 #include "JSElement.h"
 #include "JSFile.h"
 #include "WebCoreJSClientData.h"
+#include <JavaScriptCore/JSObjectInlines.h>
 #include <JavaScriptCore/ObjectConstructor.h>
 
 namespace WebCore {

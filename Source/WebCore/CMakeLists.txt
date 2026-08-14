@@ -2755,10 +2755,21 @@ set(MODERN_MEDIA_CONTROLS_SCRIPTS
     "${WEBCORE_DIR}/Modules/modern-media-controls/media/media-controller.js"
 )
 
+# Spelling every script absolutely exceeds the 8191 characters cmd.exe accepts
+# for the batch file CMake writes for this rule. The scripts share a directory,
+# so naming them relative to it keeps the concatenation well inside the limit.
+set(_modern_media_controls_dir ${WEBCORE_DIR}/Modules/modern-media-controls)
+unset(_modern_media_controls_relative_scripts)
+foreach (_script IN LISTS MODERN_MEDIA_CONTROLS_SCRIPTS)
+    file(RELATIVE_PATH _relative_script ${_modern_media_controls_dir} ${_script})
+    list(APPEND _modern_media_controls_relative_scripts ${_relative_script})
+endforeach ()
+
 add_custom_command(
     OUTPUT ${WebCore_DERIVED_SOURCES_DIR}/ModernMediaControls.js
     DEPENDS ${MODERN_MEDIA_CONTROLS_SCRIPTS}
-    COMMAND ${CMAKE_COMMAND} -E cat ${MODERN_MEDIA_CONTROLS_SCRIPTS} > ${WebCore_DERIVED_SOURCES_DIR}/ModernMediaControls.js
+    COMMAND ${CMAKE_COMMAND} -E cat ${_modern_media_controls_relative_scripts} > ${WebCore_DERIVED_SOURCES_DIR}/ModernMediaControls.js
+    WORKING_DIRECTORY ${_modern_media_controls_dir}
     VERBATIM)
 
 # Generate process sync data files

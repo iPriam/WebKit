@@ -59,6 +59,7 @@
 #include <JavaScriptCore/ImportMap.h>
 #include <JavaScriptCore/JSCellInlines.h>
 #include <JavaScriptCore/JSNativeStdFunction.h>
+#include <JavaScriptCore/JSObjectInlines.h>
 #include <JavaScriptCore/JSPromise.h>
 #include <JavaScriptCore/JSSourceCode.h>
 #include <JavaScriptCore/JSString.h>

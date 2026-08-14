@@ -48,6 +48,7 @@
 #include "SVGElement.h"
 #include "Settings.h"
 #include "WebCoreJSClientData.h"
+#include <JavaScriptCore/JSObjectInlines.h>
 
 
 namespace WebCore {

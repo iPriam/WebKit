@@ -34,7 +34,8 @@ import webkit.parser
 import webkit.model
 
 def main(argv):
-    parser = argparse.ArgumentParser(description='Generate message receivers from input files')
+    parser = argparse.ArgumentParser(description='Generate message receivers from input files',
+                                     fromfile_prefix_chars='@')
     parser.add_argument('base_dir', help='Base directory for message receiver files')
     parser.add_argument('message_receivers', nargs='+', help='Message receiver files to process')
     parser.add_argument('--output-dir', help='Directory for output files')

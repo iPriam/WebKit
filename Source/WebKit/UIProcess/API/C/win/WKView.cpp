@@ -30,6 +30,7 @@
 #include "APIPageConfiguration.h"
 #include "WKAPICast.h"
 #include "WebView.h"
+#include <wtf/RunLoop.h>
 
 using namespace WebKit;
 
@@ -71,4 +72,9 @@ void WKViewSetUsesOffscreenRendering(WKViewRef viewRef, bool enabled)
 void WKViewSetScrollOffsetOnNextResize(WKViewRef viewRef, WKSize scrollOffset)
 {
     toImpl(viewRef)->setScrollOffsetOnNextResize(toIntSize(scrollOffset));
+}
+
+void WKRunLoopCycle()
+{
+    WTF::RunLoop::cycle();
 }
